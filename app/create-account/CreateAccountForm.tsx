@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { OAuthSignIn } from "@/components/OAuthSignIn";
 import { toast } from "sonner";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { getAuthError } from "@/utils/auth-errors";
 import { auth } from "@/utils/auth";
 
@@ -113,7 +113,7 @@ export function CreateAccountForm() {
           </Button>
         </CardContent>
         <CardFooter>
-          <OAuthSignIn />
+          {/* <OAuthSignIn isLoading={isLoading} onLoadingChange={setIsLoading} /> */}
         </CardFooter>
       </form>
     </Card>

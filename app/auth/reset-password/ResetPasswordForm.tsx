@@ -16,7 +16,12 @@ import { Label } from "@/components/ui/label";
 // import { auth, type AuthError } from "@/utils/auth";
 // import { useToast } from "@/components/ui/use-toast";
 
-export function ResetPasswordForm() {
+interface ResetPasswordFormProps {
+  token?: string;
+  email?: string;
+}
+
+export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
