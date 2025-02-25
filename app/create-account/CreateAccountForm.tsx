@@ -15,17 +15,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { OAuthSignIn } from "@/components/OAuthSignIn";
+import { toast } from "sonner";
+import { useRouter } from "next/router";
+import { getAuthError } from "@/utils/auth-errors";
+import { auth } from "@/utils/auth";
 
 export function CreateAccountForm() {
-  // const [isLoading, setIsLoading] = useState(false);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match", {
+        description: "Please make sure your passwords match",
+      });
+      return;
+    }
+
+    try {
+      await auth.signUp(email, password);
+      toast.success("Success", {
+        description: "Please check your email to verify your account.",
+      });
+      router.push("/login");
+    } catch (error) {
+      const { message } = getAuthError(error);
+
+      toast.error("Account Creation Error", {
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card className="w-96">
-      <form>
+      <form onSubmit={handleCreateAccount}>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription className="text-xs">
