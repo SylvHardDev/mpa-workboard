@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-// import { useRouter } from "next/navigation";
 import { Icons } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,55 +12,49 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { auth, type AuthError } from "@/utils/auth";
-// import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import { auth, type AuthError } from "@/utils/auth";
 
-interface ResetPasswordFormProps {
-  token?: string;
-  email?: string;
-}
-
-export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
+export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  // const router = useRouter();
-  // const { toast } = useToast();
+  const router = useRouter();
+  const { toast } = useToast();
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (password !== confirmPassword) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: "Passwords do not match",
-  //     });
-  //     return;
-  //   }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+      });
+      return;
+    }
 
-  //   try {
-  //     setIsLoading(true);
-  //     await auth.resetPassword(password);
-  //     toast({
-  //       title: "Success",
-  //       description: "Your password has been reset.",
-  //     });
-  //     router.push("/login");
-  //   } catch (error) {
-  //     const authError = error as AuthError;
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Error",
-  //       description: authError.message,
-  //     });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+    try {
+      setIsLoading(true);
+      await auth.resetPassword(password);
+      toast({
+        title: "Success",
+        description: "Your password has been reset.",
+      });
+      router.push("/login");
+    } catch (error) {
+      const authError = error as AuthError;
+      toast({
+        title: "Error",
+        description: authError.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card className="w-96">
-      <form>
+      <form onSubmit={handleSubmit}>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Reset password</CardTitle>
           <CardDescription className="text-xs">

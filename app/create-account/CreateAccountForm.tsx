@@ -14,8 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { OAuthSignIn } from "@/components/OAuthSignIn";
-import { toast } from "sonner";
+// import { OAuthSignIn } from "@/components/OAuthSignIn";
+import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { getAuthError } from "@/utils/auth-errors";
 import { auth } from "@/utils/auth";
@@ -26,26 +26,31 @@ export function CreateAccountForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match", {
-        description: "Please make sure your passwords match",
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
       });
       return;
     }
 
     try {
+      setIsLoading(true);
       await auth.signUp(email, password);
-      toast.success("Success", {
+      toast({
+        title: "Success",
         description: "Please check your email to verify your account.",
       });
       router.push("/login");
     } catch (error) {
       const { message } = getAuthError(error);
 
-      toast.error("Account Creation Error", {
+      toast({
+        title: "Account Creation Error",
         description: message,
       });
     } finally {
