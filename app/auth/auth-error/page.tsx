@@ -1,13 +1,12 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import Link from 'next/link';
+} from "@/components/ui/card";
+import Link from "next/link";
 
 export default async function AuthErrorPage({
   searchParams,
@@ -25,24 +24,24 @@ export default async function AuthErrorPage({
             There was a problem with the authentication process
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <p className="text-sm text-muted-foreground">
-            {errorMessage}
-            <ul className="list-disc list-inside mt-2">
-              <li>An expired or invalid link</li>
-              <li>A cancelled OAuth process</li>
-              <li>A technical issue</li>
-            </ul>
-          </p>
+        <CardContent>
+          <div className="p-6 pt-0 grid gap-4">
+            <div className="text-sm text-muted-foreground">
+              {errorMessage}
+              <ul className="list-disc list-inside mt-2">
+                <li>An expired or invalid link</li>
+                <li>A cancelled OAuth process</li>
+                <li>A technical issue</li>
+              </ul>
+            </div>
+            <Button asChild>
+              <Link href="/login">Return to Login</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/">Go to Home</Link>
+            </Button>
+          </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2">
-          <Button asChild className="w-full">
-            <Link href="/login">Return to Login</Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/">Go to Home</Link>
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
