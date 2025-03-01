@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Icons } from "@/components/Icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 import { auth, type AuthError } from "@/utils/auth";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -27,7 +27,6 @@ export function ResetPasswordForm() {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast({
-        variant: "destructive",
         title: "Error",
         description: "Passwords do not match",
       });
@@ -45,7 +44,6 @@ export function ResetPasswordForm() {
     } catch (error) {
       const authError = error as AuthError;
       toast({
-        variant: "destructive",
         title: "Error",
         description: authError.message,
       });

@@ -3,6 +3,17 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
 
+export type ToastProps = {
+  id?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+export type ToastActionElement = React.ReactElement;
+
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {

@@ -14,18 +14,53 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { OAuthSignIn } from "@/components/OAuthSignIn";
+// import { OAuthSignIn } from "@/components/OAuthSignIn";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { getAuthError } from "@/utils/auth-errors";
+import { auth } from "@/utils/auth";
 
 export function CreateAccountForm() {
-  // const [isLoading, setIsLoading] = useState(false);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({
+        title: "Validation Error",
+        description: "Passwords do not match",
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await auth.signUp(email, password);
+      toast({
+        title: "Success",
+        description: "Please check your email to verify your account.",
+      });
+      router.push("/login");
+    } catch (error) {
+      const { message } = getAuthError(error);
+
+      toast({
+        title: "Account Creation Error",
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card className="w-96">
-      <form>
+      <form onSubmit={handleCreateAccount}>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Create an account</CardTitle>
           <CardDescription className="text-xs">
@@ -83,7 +118,7 @@ export function CreateAccountForm() {
           </Button>
         </CardContent>
         <CardFooter>
-          <OAuthSignIn />
+          {/* <OAuthSignIn isLoading={isLoading} onLoadingChange={setIsLoading} /> */}
         </CardFooter>
       </form>
     </Card>

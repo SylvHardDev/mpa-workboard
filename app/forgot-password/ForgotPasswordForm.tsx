@@ -14,15 +14,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import { auth } from "@/utils/auth";
+import { getAuthError } from "@/utils/auth-errors";
 
 export function ForgotPasswordForm() {
-  // const [isLoading, setIsLoading] = useState(false);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const response = await auth.resetPasswordRequest(email);
+      toast({
+        title: "Check your email",
+        description: response.message,
+      });
+      router.push("/login");
+    } catch (error) {
+      const { message } = getAuthError(error);
+      toast({
+        title: "Reset Password Error",
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Card className="w-96">
-      <form>
+      <form onSubmit={handleSubmit}>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Reset password</CardTitle>
           <CardDescription className="text-xs">
