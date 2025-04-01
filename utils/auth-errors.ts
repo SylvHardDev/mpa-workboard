@@ -8,6 +8,7 @@ export type AuthErrorType =
   | "WeakPassword"
   | "EmailInUse"
   | "DatabaseError"
+  | "RateLimit"
   | "Default";
 
 export const getAuthError = (
@@ -19,7 +20,7 @@ export const getAuthError = (
       case "23503":
         return {
           type: "EmailInUse",
-          message: "This email is already registered. Try signing in instead.",
+          message: "Cet email est déjà utilisé. Veuillez vous connecter à la place.",
         };
     }
   }
@@ -30,10 +31,9 @@ export const getAuthError = (
     if (errorMessage.includes("user already registered")) {
       return {
         type: "EmailInUse",
-        message: "This email is already registered. Try signing in instead.",
+        message: "Cet email est déjà utilisé. Veuillez vous connecter à la place.",
       };
     }
-    // ... rest of the error handling
   }
 
   // Handle error message directly
@@ -42,43 +42,48 @@ export const getAuthError = (
   if (errorMessage.includes("invalid login credentials")) {
     return {
       type: "InvalidCredentials",
-      message: "Invalid email or password. Please try again.",
+      message: "Email ou mot de passe incorrect. Veuillez réessayer.",
     };
   }
 
   if (errorMessage.includes("email not confirmed")) {
     return {
       type: "EmailNotConfirmed",
-      message: "Please verify your email before signing in.",
+      message: "Veuillez vérifier votre email avant de vous connecter.",
     };
   }
 
   if (errorMessage.includes("invalid email")) {
     return {
       type: "InvalidEmail",
-      message: "Please enter a valid email address.",
+      message: "Veuillez entrer une adresse email valide.",
     };
   }
 
   if (errorMessage.includes("password")) {
     return {
       type: "WeakPassword",
-      message: "Password should be at least 6 characters long.",
+      message: "Le mot de passe doit contenir au moins 6 caractères.",
     };
   }
 
-  if (
-    errorMessage.includes("email already registered") ||
-    errorMessage.includes("email is already registered")
-  ) {
+  if (errorMessage.includes("rate limit")) {
+    return {
+      type: "RateLimit",
+      message: "Trop de tentatives. Veuillez réessayer dans quelques minutes.",
+    };
+  }
+
+  if (errorMessage.includes("email already registered") ||
+      errorMessage.includes("email is already registered")) {
     return {
       type: "EmailInUse",
-      message: "This email is already registered. Try signing in instead.",
+      message: "Cet email est déjà utilisé. Veuillez vous connecter à la place.",
     };
   }
 
   return {
     type: "Default",
-    message: "An error occurred. Please try again.",
+    message: "Une erreur est survenue. Veuillez réessayer.",
   };
 };

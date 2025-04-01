@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { auth, type AuthError } from "@/utils/auth";
 import { useToast } from "@/components/ui/use-toast";
+import { getAuthError } from "@/utils/auth-errors";
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,8 +28,9 @@ export function ResetPasswordForm() {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: "Erreur de validation",
+        description: "Les mots de passe ne correspondent pas",
+        duration: 5000,
       });
       return;
     }
@@ -37,15 +39,34 @@ export function ResetPasswordForm() {
       setIsLoading(true);
       await auth.resetPassword(password);
       toast({
-        title: "Success",
-        description: "Your password has been reset.",
+        title: "Succès",
+        description: "Votre mot de passe a été réinitialisé avec succès.",
+        duration: 5000,
       });
       router.push("/login");
     } catch (error) {
       const authError = error as AuthError;
+      const { message, type } = getAuthError(error);
+
+      let title = "Erreur";
+      switch (type) {
+        case "WeakPassword":
+          title = "Mot de passe trop faible";
+          break;
+        case "RateLimit":
+          title = "Trop de tentatives";
+          break;
+        case "DatabaseError":
+          title = "Erreur de base de données";
+          break;
+        default:
+          title = "Erreur";
+      }
+
       toast({
-        title: "Error",
-        description: authError.message,
+        title,
+        description: message,
+        duration: 5000,
       });
     } finally {
       setIsLoading(false);

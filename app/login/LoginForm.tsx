@@ -36,9 +36,28 @@ export function LoginForm() {
       router.refresh();
     } catch (error) {
       console.error("Auth error:", error);
-      const { message } = getAuthError(error);
+      const { message, type } = getAuthError(error);
+
+      let title = "Erreur de connexion";
+      switch (type) {
+        case "InvalidCredentials":
+          title = "Identifiants incorrects";
+          break;
+        case "EmailNotConfirmed":
+          title = "Email non vérifié";
+          break;
+        case "InvalidEmail":
+          title = "Email invalide";
+          break;
+        case "RateLimit":
+          title = "Trop de tentatives";
+          break;
+        default:
+          title = "Erreur";
+      }
+
       toast({
-        title: "Authentication Error",
+        title,
         description: message,
         duration: 5000,
       });

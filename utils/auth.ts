@@ -90,6 +90,8 @@ export const auth = {
 },
 
 async resetPasswordRequest(email: string) {
+  console.log('Starting password reset request for:', email);
+  
   // First check if user exists in our users table and uses email provider
   const { data: user, error: userError } = await supabase
     .from("users")
@@ -97,30 +99,59 @@ async resetPasswordRequest(email: string) {
     .eq("email", email)
     .single();
 
+  console.log('User check result:', { user, userError });
+
   if (userError && userError.code !== "PGRST116") {
-    // PGRST116 means no rows returned
-    throw userError;
+    console.error('Database error:', userError);
+    throw { 
+      message: "Une erreur est survenue lors de la vérification de l'email. Veuillez réessayer.",
+      status: 500 
+    };
   }
 
-  // If user doesn't exist or doesn't use email auth, still return success
-  // This prevents email enumeration attacks
-  if (!user || user.provider !== "email") {
-    return {
-      success: true,
-      message: "If an account exists, a password reset link will be sent.",
+  // If user doesn't exist or doesn't use email auth
+  if (!user) {
+    console.log('User not found');
+    throw { 
+      message: "Aucun compte n'existe avec cet email.",
+      status: 404 
+    };
+  }
+
+  if (user.provider !== "email") {
+    console.log('User not using email auth');
+    throw { 
+      message: "Ce compte utilise une autre méthode de connexion. Veuillez utiliser la méthode appropriée.",
+      status: 400 
     };
   }
 
   const resetLink = `${location.origin}/auth/reset-password`;
+  console.log('Sending reset email with link:', resetLink);
+  
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: resetLink,
   });
 
-  if (error) throw error;
+  console.log('Reset email result:', { data, error });
+
+  if (error) {
+    console.error('Reset email error:', error);
+    if (error.message.includes('rate limit')) {
+      throw { 
+        message: "Trop de tentatives. Veuillez réessayer dans quelques minutes.",
+        status: 429 
+      };
+    }
+    throw { 
+      message: "Une erreur est survenue lors de l'envoi de l'email. Veuillez réessayer.",
+      status: 500 
+    };
+  }
 
   return {
     success: true,
-    message: "If an account exists, a password reset link will be sent.",
+    message: "Un lien de réinitialisation a été envoyé à votre adresse email.",
   };
 },
 

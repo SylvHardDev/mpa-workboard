@@ -31,15 +31,37 @@ export function ForgotPasswordForm() {
       setIsLoading(true);
       const response = await auth.resetPasswordRequest(email);
       toast({
-        title: "Check your email",
+        title: "Succès",
         description: response.message,
+        duration: 5000,
       });
       router.push("/login");
-    } catch (error) {
-      const { message } = getAuthError(error);
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      const { message, type } = getAuthError(error);
+
+      let title = "Erreur";
+      switch (type) {
+        case "InvalidEmail":
+          title = "Email invalide";
+          break;
+        case "RateLimit":
+          title = "Trop de tentatives";
+          break;
+        case "EmailNotConfirmed":
+          title = "Email non vérifié";
+          break;
+        case "DatabaseError":
+          title = "Erreur de base de données";
+          break;
+        default:
+          title = "Erreur";
+      }
+
       toast({
-        title: "Reset Password Error",
+        title,
         description: message,
+        duration: 5000,
       });
     } finally {
       setIsLoading(false);
